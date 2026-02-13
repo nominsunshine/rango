@@ -1,28 +1,33 @@
-<!DOCTYPE html>
-<html>
+{% extends 'rango/base.html' %}
+{% load staticfiles %}
 
-<head>
-    <title>Rango</title>
-</head>
+{% block title_block %}
+{% if category %}
+{{ category.name }}
+{% else %}
+Unknown Category
+{% endif %}
+{% endblock %}
 
-<body>
-    <h1>Add a Category</h1>
+{% block body_block %}
+{% if category %}
+<h1>{{ category.name }}</h1>
 
-    <form id="category_form" method="post" action="/rango/add_category/">
-        {% csrf_token %}
-        {% for hidden in form.hidden_fields %}
-        {{ hidden }}
-        {% endfor %}
+{% if pages %}
+<ul>
+    {% for page in pages %}
+    <li><a href="{{ page.url }}">{{ page.title }}</a></li>
+    {% endfor %}
+</ul>
+{% else %}
+<strong>No pages currently in category.</strong>
+{% endif %}
 
-        {% for field in form.visible_fields %}
-        {{ field.errors }}
-        {{ field.help_text }}<br />
-        {{ field }}<br />
-        {% endfor %}
+{% if user.is_authenticated %}
+<a href="{% url 'rango:add_page' category.slug %}">Add Page</a><br />
+{% endif %}
 
-        <input type="submit" name="submit" value="Create Category" />
-    </form>
-
-</body>
-
-</html>
+{% else %}
+The specified category does not exist.
+{% endif %}
+{% endblock %}
